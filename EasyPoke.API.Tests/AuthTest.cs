@@ -25,8 +25,8 @@ public class AuthTest
         var response = await client.GetAsync(url);
 
         // Assert
-        Assert.Equal(response.StatusCode,
-                     HttpStatusCode.Unauthorized);
+        Assert.Equal(HttpStatusCode.Unauthorized,
+                     response.StatusCode);
     }
 
     [Theory]
@@ -41,7 +41,7 @@ public class AuthTest
         var response = await client.GetAsync(url);
 
         // Assert
-        Assert.Equal(response.StatusCode,
-                     HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK,
+                     response.StatusCode);
     }
 }
