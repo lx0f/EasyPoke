@@ -1,7 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace EasyPoke.API.Tests;
+namespace EasyPoke.API.Tests.Systems.Controllers;
 
 public class AuthTest
 {
