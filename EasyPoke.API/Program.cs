@@ -1,4 +1,5 @@
 using EasyPoke.API.Repositories;
+using EasyPoke.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
