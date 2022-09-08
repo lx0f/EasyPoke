@@ -15,6 +15,7 @@ public class UserController : ControllerBase
         _service = service;
     }
 
+    [HttpPost]
     public IActionResult RegisterUser(string username, string email, string password)
     {
         bool result = _service.RegisterUser(username, email, password);
