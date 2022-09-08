@@ -15,6 +15,17 @@ public class UserController : ControllerBase
         _service = service;
     }
 
+    [HttpGet]
+    public IActionResult GetUserByusername(string username)
+    {
+        var user = _service.GetUserByUsername(username);
+        
+        if (user == null)
+            return NotFound();
+
+        return Ok(user);
+    }
+
     [HttpPost]
     public IActionResult RegisterUser(string username, string email, string password)
     {
