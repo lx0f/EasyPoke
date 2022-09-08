@@ -13,6 +13,11 @@ public class UserService : IUserService
         _repository = repository;
     }
 
+    public User? GetUserByEmail(string email)
+    {
+        return _repository.GetUserByEmail(email);
+    }
+
     public User? GetUserByUsername(string username)
     {
         return _repository.GetUserByUsername(username);
