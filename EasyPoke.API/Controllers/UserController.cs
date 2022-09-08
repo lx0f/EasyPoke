@@ -39,4 +39,15 @@ public class UserController : ControllerBase
 
         return Conflict();
     }
+
+    [HttpPatch]
+    public IActionResult UpdateUserUsername(int id, string username)
+    {
+        var result = _service.UpdateUserUsername(id, username); 
+
+        if (!result)
+            return BadRequest();
+
+        return NoContent();
+    }
 }
