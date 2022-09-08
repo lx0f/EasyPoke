@@ -16,7 +16,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetUserByusername(string username)
+    public IActionResult GetUserByUsername(string username)
     {
         var user = _service.GetUserByUsername(username);
         

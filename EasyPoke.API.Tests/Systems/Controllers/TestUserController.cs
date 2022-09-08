@@ -82,7 +82,7 @@ public class TestUserController
         var controller = new UserController(mockUserService.Object);
 
         // Act
-        var result = controller.GetUserByusername(username);
+        var result = controller.GetUserByUsername(username);
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
@@ -105,7 +105,7 @@ public class TestUserController
         var controller = new UserController(mockUserService.Object);
 
         // Act
-        var result = controller.GetUserByusername(username);
+        var result = controller.GetUserByUsername(username);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
