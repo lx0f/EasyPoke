@@ -61,4 +61,52 @@ public class TestUserController
         // Assert
         result.Should().BeOfType<ConflictResult>();
     }
+
+    [Fact]
+    public void GetUserByUsername_OnSuccess_ReturnUserOkObject()
+    {
+        // Arrange
+        string username = "testuser";
+        var mockUserService = new Mock<IUserService>();
+        mockUserService
+            .Setup(service => service.GetUserByUsername(It.IsAny<string>()))
+            .Returns(new User()
+            {
+                Id = 1,
+                Username = username,
+                Email = "testuser@example.com",
+                Password = "12345678Aa"
+            });
+
+        var controller = new UserController(mockUserService.Object);
+
+        // Act
+        var result = controller.GetUserByusername(username);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okObject = (OkObjectResult)result;
+        okObject.Value.Should().BeOfType<User>();
+        var user = (User)okObject.Value;
+        user.Username.Should().Be(username);
+    }
+
+    [Fact]
+    public void GetUserByUsername_WithUnexistentUser_ReturnNotFound()
+    {
+        // Arrange
+        string username = "testuser";
+        var mockUserService = new Mock<IUserService>();
+        mockUserService
+            .Setup(service => service.GetUserByUsername(It.IsAny<string>()))
+            .Returns(() => { return null; });
+
+        var controller = new UserController(mockUserService.Object);
+
+        // Act
+        var result = controller.GetUserByusername(username);
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+    }
 }
