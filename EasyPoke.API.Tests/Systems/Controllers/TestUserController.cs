@@ -110,4 +110,50 @@ public class TestUserController
         // Assert
         result.Should().BeOfType<NotFoundResult>();
     }
+
+    [Fact]
+    public void UpdateUserUsername_OnSuccess_ReturnNoContent()
+    {
+        // Arrange
+        var mockUserService = new Mock<IUserService>();
+        mockUserService
+            .Setup(service => service.UpdateUserUsername(
+                It.IsAny<int>(),
+                It.IsAny<string>()))
+            .Returns(true);
+
+        var controller = new UserController(mockUserService.Object);
+
+        int id = 1;
+        string username = "newtestuser";
+
+        // Act
+        var result = controller.UpdateUserUsername(id, username);
+
+        // Arrange
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [Fact]
+    public void UpdateUserUsername_OnFail_ReturnBadRequest()
+    {
+        // Arrange
+        var mockUserService = new Mock<IUserService>();
+        mockUserService
+            .Setup(service => service.UpdateUserUsername(
+                It.IsAny<int>(),
+                It.IsAny<string>()))
+            .Returns(false);
+
+        var controller = new UserController(mockUserService.Object);
+
+        int id = 1;
+        string username = "newtestuser";
+
+        // Act
+        var result = controller.UpdateUserUsername(id, username);
+
+        // Arrange
+        result.Should().BeOfType<BadRequestResult>();
+    }
 }
