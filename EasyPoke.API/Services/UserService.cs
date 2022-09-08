@@ -58,6 +58,11 @@ public class UserService : IUserService
         return true;
     }
 
+    public bool UpdateUserUsername(int id, string username)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool ValidatePassword(string password)
     {
         Regex hasUppercaseChar = new Regex(@"[A-Z]+");
