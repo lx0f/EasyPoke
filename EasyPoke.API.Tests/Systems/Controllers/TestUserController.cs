@@ -47,11 +47,12 @@ public class TestUserController
         string password = "12345678";
 
         var mockUserService = new Mock<IUserService>();
-        mockUserService.Setup(service => service.RegisterUser(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>()))
-                        .Returns(false);
+        mockUserService
+            .Setup(service => service.RegisterUser(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>()))
+            .Returns(false);
 
         var controller = new UserController(mockUserService.Object);
 
