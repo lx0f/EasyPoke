@@ -4,8 +4,11 @@ namespace EasyPoke.API.Repositories;
 
 public interface IUserRepository
 {
-    bool AddUser(User user);
+    void AddUser(User user);
+    void DeleteUser(int id);
     User? GetUserByEmail(string email);
+    User? GetUserById(int id);
     User? GetUserByUsername(string username);
-    void Save();
+    void UpdateUser(User user);
 }
+

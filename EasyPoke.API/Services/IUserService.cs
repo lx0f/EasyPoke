@@ -4,9 +4,13 @@ namespace EasyPoke.API.Services;
 
 public interface IUserService
 {
-    User? GetUserByUsername(string username);
+    bool DeleteUser(int id);
     User? GetUserByEmail(string email);
-    bool RegisterUser(string username, string email, string password);
-    bool ValidatePassword(string password);
+    User? GetUserById(int id);
+    User? GetUserByUsername(string username);
+    User? RegisterUser(UserRegisterInfo info);
+    bool UpdateUserEmail(int id, string email);
+    bool UpdateUserPassword(int id, string password);
     bool UpdateUserUsername(int id, string username);
 }
+

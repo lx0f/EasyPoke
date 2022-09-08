@@ -1,4 +1,5 @@
 using EasyPoke.API.Auth;
+using EasyPoke.API.Models;
 using EasyPoke.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,39 +16,106 @@ public class UserController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public IActionResult GetUserByUsername(string username)
+    [HttpGet("{id}", Name = "GetUserById")]
+    public IActionResult GetUserById(int id)
     {
-        var user = _service.GetUserByUsername(username);
-        
+        User? user = _service.GetUserById(id); 
+
         if (user == null)
             return NotFound();
 
         return Ok(user);
     }
 
-    [HttpPost]
-    public IActionResult RegisterUser(string username, string email, string password)
+    [HttpGet("username", Name = "GetUserByUsername")]
+    public IActionResult GetUserByUsername(string username)
     {
-        bool result = _service.RegisterUser(username, email, password);
+        User? user = _service.GetUserByUsername(username);
 
-        if (result)
-        {
-            var user = _service.GetUserByUsername(username);
-            return CreatedAtAction(nameof(RegisterUser), user);
-        }
+        if (user == null)
+            return NotFound();
 
-        return Conflict();
+        return Ok(user);
     }
 
-    [HttpPatch]
+    [HttpGet("email", Name = "GetUserByEmail")]
+    public IActionResult GetUserByEmail(string email)
+    {
+        User? user = _service.GetUserByEmail(email);
+
+        if (user == null)
+            return NotFound();
+
+        return Ok(user);
+    }
+
+    [HttpPost("register", Name = "RegisterUser")]
+    public IActionResult RegisterUser(UserRegisterInfo info)
+    {
+        User? user = _service.RegisterUser(info);
+
+        if (user == null)
+            return BadRequest();
+
+        return CreatedAtAction(nameof(RegisterUser), user);
+    }
+
+    [HttpPatch("{id}/username", Name = "UpdateUsername")]
     public IActionResult UpdateUserUsername(int id, string username)
     {
-        var result = _service.UpdateUserUsername(id, username); 
+        User? user = _service.GetUserById(id);
+
+        if (user == null)
+            return NotFound();
+
+        bool result = _service.UpdateUserUsername(id, username);
 
         if (!result)
             return BadRequest();
 
-        return NoContent();
+        return Ok();
+    }
+
+    [HttpPatch("{id}/email", Name = "UpdateEmail")]
+    public IActionResult UpdateUserEmail(int id, string email)
+    {
+        User? user = _service.GetUserById(id);
+
+        if (user == null)
+            return NotFound();
+
+        bool result = _service.UpdateUserEmail(id, email);
+
+        if (!result)
+            return BadRequest();
+
+        return Ok();
+    }
+
+    [HttpPatch("{id}/password", Name = "UpdatePassword")]
+    public IActionResult UpdateUserpassword(int id, string password)
+    {
+        User? user = _service.GetUserById(id);
+
+        if (user == null)
+            return NotFound();
+
+        bool result = _service.UpdateUserPassword(id, password);
+
+        if (!result)
+            return BadRequest();
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteUser(int id)
+    {
+        bool result = _service.DeleteUser(id);
+
+        if (!result)
+            return NotFound();
+
+        return Ok();
     }
 }

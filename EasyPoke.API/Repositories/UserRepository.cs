@@ -11,26 +11,44 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public bool AddUser(User user)
+    public void AddUser(User user)
     {
         _context.Users.Add(user);
-        return true;
+        _context.SaveChanges();
+    }
+
+    public void DeleteUser(int id)
+    {
+        User? user = _context.Users.Find(id);
+
+        if (user == null)
+            throw new KeyNotFoundException();
+
+        _context.Users.Remove(user);
+        _context.SaveChanges();
     }
 
     public User? GetUserByEmail(string email)
     {
-        User? user = _context.Users.Where(u => u.Email == email).FirstOrDefault();
+        User? user = _context.Users.FirstOrDefault(u => u.Email == email);
+        return user;
+    }
+
+    public User? GetUserById(int id)
+    {
+        User? user = _context.Users.Find(id);
         return user;
     }
 
     public User? GetUserByUsername(string username)
     {
-        User? user = _context.Users.Where(u => u.Username == username).FirstOrDefault();
+        User? user = _context.Users.FirstOrDefault(u => u.Username == username);
         return user;
     }
 
-    public void Save()
+    public void UpdateUser(User user)
     {
+        _context.Users.Update(user);
         _context.SaveChanges();
     }
 }
