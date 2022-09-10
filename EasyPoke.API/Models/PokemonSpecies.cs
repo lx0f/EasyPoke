@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EasyPoke.API.Models;
 
-public class Pokemon
+public class PokemonSpecies
 {
     [Key]
     public int Id { get; set; }
