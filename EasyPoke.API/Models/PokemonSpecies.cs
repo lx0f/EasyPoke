@@ -14,6 +14,8 @@ public class PokemonSpecies
     public int SpecialDefense { get; set; }
     public int Speed { get; set; }
 
-    public PokemonType Type { get; set; }
+    public PokemonType Type1 { get; set; }
+    public PokemonType? Type2 { get; set; }
     public GrowthRate GrowthRate { get; set; }
+    public PokemonSpecies? EvolvedFrom { get; set; }
 }
