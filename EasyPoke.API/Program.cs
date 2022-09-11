@@ -54,7 +54,7 @@ optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionStr
 var options = optionsBuilder.Options;
 var context = new DataContext(options);
 
-var folderPath = "./Data/csv/test/";
+var folderPath = "/Users/andy/Personal/EasyPoke/EasyPoke.API/Data/csv/test/";
 var typeFilePath = folderPath + "pokemon_types.csv";
 var typeEfficacyFilePath = folderPath + "type_efficacy.csv";
 var growthRateFilePath = folderPath + "growth_rates.csv";
@@ -70,6 +70,7 @@ var importer = new PokemonDataImporter(
     typeEfficacyFilePath);
 
 importer.Import();
+context.Dispose();
 
 app.Run();
 

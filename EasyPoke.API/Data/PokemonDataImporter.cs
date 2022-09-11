@@ -26,6 +26,10 @@ public class PokemonDataImporter
 
     public void Import()
     {
+        var allTypes = _context.PokemonTypes.ToList();
+        _context.PokemonTypes.RemoveRange(allTypes);
+        _context.SaveChanges();
+
         // Import all Types
         // Register Type Relations
         // - Weak To
@@ -37,12 +41,12 @@ public class PokemonDataImporter
         // Import all Growth Rate
         // Import all Growth Rate Level Experience
         // Register all Growth Rate and Level Experience Relations
-        ImportGrowthRate();
+        // TODO: ImportGrowthRate();
 
         // Import all Pokemons
         // Register all Pokemon and Pokemon Types Relations
         // Register all Pokemon and Growth Rate Relations
-        ImportPokemons();
+        // TODO: ImportPokemons();
     }
 
     private void ImportPokemons()
