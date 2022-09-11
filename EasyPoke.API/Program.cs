@@ -1,3 +1,4 @@
+using EasyPoke.API.Data;
 using EasyPoke.API.Repositories;
 using EasyPoke.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,29 @@ app.UseCors(defaultPolicy);
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Setup Pokemon data
+var optionsBuilder = new DbContextOptionsBuilder();
+optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+var options = optionsBuilder.Options;
+var context = new DataContext(options);
+
+var folderPath = "./Data/csv/test/";
+var typeFilePath = folderPath + "pokemon_types.csv";
+var typeEfficacyFilePath = folderPath + "type_efficacy.csv";
+var growthRateFilePath = folderPath + "growth_rates.csv";
+var growthRateLevelExperienceFilePath = folderPath + "experience.csv";
+var pokemonFilePath = folderPath + "pokemon_species.csv";
+
+var importer = new PokemonDataImporter(
+    context,
+    typeFilePath,
+    growthRateFilePath,
+    growthRateLevelExperienceFilePath,
+    pokemonFilePath,
+    typeEfficacyFilePath);
+
+importer.Import();
 
 app.Run();
 

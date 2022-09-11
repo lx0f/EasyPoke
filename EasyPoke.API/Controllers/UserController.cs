@@ -19,7 +19,7 @@ public class UserController : ControllerBase
     [HttpGet("{id}", Name = "GetUserById")]
     public IActionResult GetUserById(int id)
     {
-        User? user = _service.GetUserById(id); 
+        User? user = _service.GetUserById(id);
 
         if (user == null)
             return NotFound();

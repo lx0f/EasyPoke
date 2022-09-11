@@ -5,7 +5,7 @@ namespace EasyPoke.API.Models;
 public class PokemonType
 {
     [Key]
-    public int Id { get; set; } 
+    public int Id { get; set; }
     public string Name { get; set; }
 
     public ICollection<PokemonType> WeakTo { get; set; }
