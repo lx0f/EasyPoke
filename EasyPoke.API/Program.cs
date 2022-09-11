@@ -49,28 +49,29 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Setup Pokemon data
+
 var optionsBuilder = new DbContextOptionsBuilder();
 optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 var options = optionsBuilder.Options;
-var context = new DataContext(options);
 
-var folderPath = "/Users/andy/Personal/EasyPoke/EasyPoke.API/Data/csv/test/";
-var typeFilePath = folderPath + "pokemon_types.csv";
-var typeEfficacyFilePath = folderPath + "type_efficacy.csv";
-var growthRateFilePath = folderPath + "growth_rates.csv";
-var growthRateLevelExperienceFilePath = folderPath + "experience.csv";
-var pokemonFilePath = folderPath + "pokemon_species.csv";
+using (var context = new DataContext(options))
+{
+    var folderPath = "/Users/andy/Personal/EasyPoke/EasyPoke.API/Data/csv/test/";
+    var typeFilePath = folderPath + "pokemon_types.csv";
+    var typeEfficacyFilePath = folderPath + "type_efficacy.csv";
+    var growthRateFilePath = folderPath + "growth_rates.csv";
+    var growthRateLevelExperienceFilePath = folderPath + "experience.csv";
+    var pokemonFilePath = folderPath + "pokemon_species.csv";
+    var importer = new PokemonDataImporter(
+        context,
+        typeFilePath,
+        growthRateFilePath,
+        growthRateLevelExperienceFilePath,
+        pokemonFilePath,
+        typeEfficacyFilePath);
 
-var importer = new PokemonDataImporter(
-    context,
-    typeFilePath,
-    growthRateFilePath,
-    growthRateLevelExperienceFilePath,
-    pokemonFilePath,
-    typeEfficacyFilePath);
-
-importer.Import();
-context.Dispose();
+    importer.Import();
+}
 
 app.Run();
 
