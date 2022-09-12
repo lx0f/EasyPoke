@@ -1,4 +1,4 @@
-id,identifier,evolves_from_species_id,growth_rate_id,hp,attack,defense,special-attack,special-defense,speed
+id,name,evolves_from_species_id,growth_rate_id,hp,attack,defense,special-attack,special-defense,speed
 1,bulbasaur,,4,49,49,45,65,65,45
 2,ivysaur,1,4,62,63,60,80,80,60
 3,venusaur,2,4,82,83,80,100,100,80

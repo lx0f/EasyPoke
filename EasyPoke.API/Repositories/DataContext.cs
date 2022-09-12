@@ -13,4 +13,5 @@ public class DataContext : DbContext
     public DbSet<PokemonType> PokemonTypes { get; set; }
     public DbSet<GrowthRate> GrowthRates { get; set; }
     public DbSet<GrowthRateLevelExperience> GrowthRateLevelExperiences { get; set; }
+    public DbSet<PokemonSpecies> PokemonSpecies { get; set; }
 }

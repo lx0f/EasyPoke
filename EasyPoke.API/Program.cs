@@ -57,7 +57,8 @@ var options = optionsBuilder.Options;
 using (var context = new DataContext(options))
 {
     var folderPath = "/Users/andy/Personal/EasyPoke/EasyPoke.API/Data/csv/test/";
-    var typeFilePath = folderPath + "pokemon_types.csv";
+    var typeFilePath = folderPath + "types.csv";
+    var pokemonTypeFilePath = folderPath + "pokemon_types.csv";
     var typeEfficacyFilePath = folderPath + "type_efficacy.csv";
     var growthRateFilePath = folderPath + "growth_rates.csv";
     var growthRateLevelExperienceFilePath = folderPath + "experience.csv";
@@ -68,7 +69,8 @@ using (var context = new DataContext(options))
         growthRateFilePath,
         growthRateLevelExperienceFilePath,
         pokemonFilePath,
-        typeEfficacyFilePath);
+        typeEfficacyFilePath,
+        pokemonTypeFilePath);
 
     importer.Import();
 }

@@ -13,6 +13,7 @@ public class PokemonDataImporter
     private readonly string _growthRateFilePath;
     private readonly string _growthRateLevelExperienceFilePath;
     private readonly string _pokemonFilePath;
+    private readonly string _pokemonTypeFilePath;
 
     public PokemonDataImporter(
         DataContext context,
@@ -20,7 +21,8 @@ public class PokemonDataImporter
         string growthRateFilePath,
         string growthRateLevelExperienceFilePath,
         string pokemonFilePath,
-        string typeEfficacyFilePath)
+        string typeEfficacyFilePath,
+        string pokemonTypeFilePath)
     {
         _context = context;
         _typeFilePath = typeFilePath;
@@ -28,6 +30,7 @@ public class PokemonDataImporter
         _growthRateLevelExperienceFilePath = growthRateLevelExperienceFilePath;
         _pokemonFilePath = pokemonFilePath;
         _typeEfficacyFilePath = typeEfficacyFilePath;
+        _pokemonTypeFilePath = pokemonTypeFilePath;
 
         var types = _context.PokemonTypes.ToList();
         _context.PokemonTypes.RemoveRange(types);
@@ -37,6 +40,9 @@ public class PokemonDataImporter
 
         var levelExperiences = _context.GrowthRateLevelExperiences.ToList();
         _context.GrowthRateLevelExperiences.RemoveRange(levelExperiences);
+
+        var pokemonSpecies = _context.PokemonSpecies.ToList();
+        _context.PokemonSpecies.RemoveRange(pokemonSpecies);
 
         _context.SaveChanges();
     }
@@ -63,12 +69,123 @@ public class PokemonDataImporter
         // Import all Pokemons
         // Register all Pokemon and Pokemon Types Relations
         // Register all Pokemon and Growth Rate Relations
-        // TODO: ImportPokemons();
+        ImportPokemons();
     }
 
     private void ImportPokemons()
     {
-        throw new NotImplementedException();
+        int idIndex = 0;
+        int nameIndex = 1;
+        int evolveFromIdIndex = 2;
+        int growthRateIdIndex = 3;
+        int hitPointIndex = 4;
+        int attackIndex = 5;
+        int defenseIndex = 6;
+        int specialAttackIndex = 7;
+        int specialDefenseIndex = 8;
+        int speedIndex = 9;
+
+        using (StreamReader sr = new(_pokemonFilePath))
+        {
+            sr.ReadLine(); // Skip header
+
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] lineData = line.Split(',');
+
+                int id = Convert.ToInt16(lineData[idIndex]);
+                string name = lineData[nameIndex];
+                int growthRateId = Convert.ToInt16(lineData[growthRateIdIndex]);
+                int hitPoint = Convert.ToInt16(lineData[hitPointIndex]);
+                int attack = Convert.ToInt16(lineData[attackIndex]);
+                int defense = Convert.ToInt16(lineData[defenseIndex]);
+                int specialAttack = Convert.ToInt16(lineData[specialAttackIndex]);
+                int specialDefense = Convert.ToInt16(lineData[specialDefenseIndex]);
+                int speed = Convert.ToInt16(lineData[speedIndex]);
+
+                GrowthRate? growthRate = _context.GrowthRates.Find(growthRateId);
+
+                if (growthRate == null)
+                    throw new NullReferenceException();
+
+                _context.PokemonSpecies.Add(new PokemonSpecies()
+                {
+                    Id = id,
+                    Name = name,
+                    HitPoint = hitPoint,
+                    Attack = attack,
+                    Defense = defense,
+                    SpecialAttack = specialAttack,
+                    SpecialDefense = specialDefense,
+                    Speed = speed,
+                    GrowthRate = growthRate
+                });
+            }
+        }
+
+        using (StreamReader sr = new(_pokemonTypeFilePath))
+        {
+            string line;
+            int pokemonIdIndex = 0;
+            int typeIdIndex = 1;
+            int slotIndex = 2;
+            sr.ReadLine(); // skip header
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] lineData = line.Split(',');
+                int pokemonId = Convert.ToInt16(lineData[pokemonIdIndex]);
+                int typeId = Convert.ToInt16(lineData[typeIdIndex]);
+                int slot = Convert.ToInt16(lineData[slotIndex]);
+
+                PokemonSpecies pokemon = _context.PokemonSpecies.Find(pokemonId);
+                PokemonType type = _context.PokemonTypes.Find(typeId);
+
+                if (pokemon == null)
+                    throw new NullReferenceException();
+
+                if (type == null)
+                    throw new NullReferenceException();
+
+                if (slot == 1)
+                {
+                    pokemon.Type1 = type;
+                }
+                else if (slot == 2)
+                {
+                    pokemon.Type2 = type;
+                }
+            }
+        }
+
+        using (StreamReader sr = new(_pokemonFilePath))
+        {
+            string line;
+            sr.ReadLine(); // skip header
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] lineData = line.Split(',');
+
+                string evolveFromIdString = lineData[evolveFromIdIndex];
+
+                if (evolveFromIdString.Length == 0)
+                    continue;
+
+                int id = Convert.ToInt16(lineData[idIndex]);
+                int evolveFromId = Convert.ToInt16(evolveFromIdString);
+
+                PokemonSpecies? descendantSpecies = _context.PokemonSpecies.Find(id);
+                PokemonSpecies? baseSpecies = _context.PokemonSpecies.Find(evolveFromId);
+
+                if (descendantSpecies == null)
+                    throw new NullReferenceException();
+
+                if (baseSpecies != null)
+                    descendantSpecies.EvolvedFrom = baseSpecies;
+            }
+        }
+
+        _context.SaveChanges();
     }
 
     private void ImportGrowthRate()
@@ -127,7 +244,7 @@ public class PokemonDataImporter
                 }
                 else if (c == '\n')
                 {
-                    if (inQuote)  
+                    if (inQuote)
                     {
                         buffer += c;
                     }
