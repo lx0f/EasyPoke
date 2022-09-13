@@ -8,21 +8,21 @@ namespace EasyPoke.API.Data;
 public class PokemonDataImporter
 {
     private readonly DataContext _context;
+    private readonly string _pokemonFilePath;
+    private readonly string _pokemonTypeFilePath;
     private readonly string _typeFilePath;
     private readonly string _typeEfficacyFilePath;
     private readonly string _growthRateFilePath;
     private readonly string _growthRateLevelExperienceFilePath;
-    private readonly string _pokemonFilePath;
-    private readonly string _pokemonTypeFilePath;
 
     public PokemonDataImporter(
         DataContext context,
-        string typeFilePath,
-        string growthRateFilePath,
-        string growthRateLevelExperienceFilePath,
         string pokemonFilePath,
+        string pokemonTypeFilePath,
+        string typeFilePath,
         string typeEfficacyFilePath,
-        string pokemonTypeFilePath)
+        string growthRateFilePath,
+        string growthRateLevelExperienceFilePath)
     {
         _context = context;
         _typeFilePath = typeFilePath;
@@ -31,27 +31,11 @@ public class PokemonDataImporter
         _pokemonFilePath = pokemonFilePath;
         _typeEfficacyFilePath = typeEfficacyFilePath;
         _pokemonTypeFilePath = pokemonTypeFilePath;
-
-        var types = _context.PokemonTypes.ToList();
-        _context.PokemonTypes.RemoveRange(types);
-
-        var growthRates = _context.GrowthRates.ToList();
-        _context.GrowthRates.RemoveRange(growthRates);
-
-        var levelExperiences = _context.GrowthRateLevelExperiences.ToList();
-        _context.GrowthRateLevelExperiences.RemoveRange(levelExperiences);
-
-        var pokemonSpecies = _context.PokemonSpecies.ToList();
-        _context.PokemonSpecies.RemoveRange(pokemonSpecies);
-
-        _context.SaveChanges();
     }
 
     public void Import()
     {
-        var allTypes = _context.PokemonTypes.ToList();
-        _context.PokemonTypes.RemoveRange(allTypes);
-        _context.SaveChanges();
+        RemoveAll();
 
         // Import all Types
         // Register Type Relations
@@ -70,6 +54,23 @@ public class PokemonDataImporter
         // Register all Pokemon and Pokemon Types Relations
         // Register all Pokemon and Growth Rate Relations
         ImportPokemons();
+    }
+
+    private void RemoveAll()
+    {
+        var types = _context.PokemonTypes.ToList();
+        _context.PokemonTypes.RemoveRange(types);
+
+        var growthRates = _context.GrowthRates.ToList();
+        _context.GrowthRates.RemoveRange(growthRates);
+
+        var levelExperiences = _context.GrowthRateLevelExperiences.ToList();
+        _context.GrowthRateLevelExperiences.RemoveRange(levelExperiences);
+
+        var pokemonSpecies = _context.PokemonSpecies.ToList();
+        _context.PokemonSpecies.RemoveRange(pokemonSpecies);
+
+        _context.SaveChanges();
     }
 
     private void ImportPokemons()
