@@ -71,6 +71,7 @@ public class PokemonDataImporter
         _context.PokemonSpecies.RemoveRange(pokemonSpecies);
 
         _context.SaveChanges();
+
     }
 
     private void ImportPokemons()
@@ -82,107 +83,99 @@ public class PokemonDataImporter
         int hitPointIndex = 4;
         int attackIndex = 5;
         int defenseIndex = 6;
-        int specialAttackIndex = 7;
-        int specialDefenseIndex = 8;
+        int spAttackIndex = 7;
+        int spDefenseIndex = 8;
         int speedIndex = 9;
 
-        using (StreamReader sr = new(_pokemonFilePath))
+        // Add pokemons
+        List<List<string>> pokemonSpeciesData;
+        using (StreamReader sr = new StreamReader(_pokemonFilePath))
         {
-            sr.ReadLine(); // Skip header
-
-            string line;
-            while ((line = sr.ReadLine()) != null)
-            {
-                string[] lineData = line.Split(',');
-
-                int id = Convert.ToInt16(lineData[idIndex]);
-                string name = lineData[nameIndex];
-                int growthRateId = Convert.ToInt16(lineData[growthRateIdIndex]);
-                int hitPoint = Convert.ToInt16(lineData[hitPointIndex]);
-                int attack = Convert.ToInt16(lineData[attackIndex]);
-                int defense = Convert.ToInt16(lineData[defenseIndex]);
-                int specialAttack = Convert.ToInt16(lineData[specialAttackIndex]);
-                int specialDefense = Convert.ToInt16(lineData[specialDefenseIndex]);
-                int speed = Convert.ToInt16(lineData[speedIndex]);
-
-                GrowthRate? growthRate = _context.GrowthRates.Find(growthRateId);
-
-                if (growthRate == null)
-                    throw new NullReferenceException();
-
-                _context.PokemonSpecies.Add(new PokemonSpecies()
-                {
-                    Id = id,
-                    Name = name,
-                    HitPoint = hitPoint,
-                    Attack = attack,
-                    Defense = defense,
-                    SpecialAttack = specialAttack,
-                    SpecialDefense = specialDefense,
-                    Speed = speed,
-                    GrowthRate = growthRate
-                });
-            }
+            CsvReader cr = new CsvReader(sr, 10, true);
+            pokemonSpeciesData = cr.Read();
         }
 
-        using (StreamReader sr = new(_pokemonTypeFilePath))
+        foreach (List<string> pokemonData in pokemonSpeciesData)
         {
-            string line;
-            int pokemonIdIndex = 0;
-            int typeIdIndex = 1;
-            int slotIndex = 2;
-            sr.ReadLine(); // skip header
-            while ((line = sr.ReadLine()) != null)
+            int id = Convert.ToInt16(pokemonData[idIndex]);
+            string name = pokemonData[nameIndex];
+            int hitPoint = Convert.ToInt16(pokemonData[hitPointIndex]);
+            int attack = Convert.ToInt16(pokemonData[attackIndex]);
+            int defense = Convert.ToInt16(pokemonData[defenseIndex]);
+            int spAttack = Convert.ToInt16(pokemonData[spAttackIndex]);
+            int spDefense = Convert.ToInt16(pokemonData[spDefenseIndex]);
+            int speed = Convert.ToInt16(pokemonData[speedIndex]);
+
+            // TODO: change to pokemonspecies repository
+            _context.PokemonSpecies.Add(new PokemonSpecies()
             {
-                string[] lineData = line.Split(',');
-                int pokemonId = Convert.ToInt16(lineData[pokemonIdIndex]);
-                int typeId = Convert.ToInt16(lineData[typeIdIndex]);
-                int slot = Convert.ToInt16(lineData[slotIndex]);
-
-                PokemonSpecies pokemon = _context.PokemonSpecies.Find(pokemonId);
-                PokemonType type = _context.PokemonTypes.Find(typeId);
-
-                if (pokemon == null)
-                    throw new NullReferenceException();
-
-                if (type == null)
-                    throw new NullReferenceException();
-
-                if (slot == 1)
-                {
-                    pokemon.Type1 = type;
-                }
-                else if (slot == 2)
-                {
-                    pokemon.Type2 = type;
-                }
-            }
+                Id = id,
+                Name = name,
+                HitPoint = hitPoint,
+                Attack = attack,
+                Defense = defense,
+                SpecialAttack = spAttack,
+                SpecialDefense = spDefense,
+                Speed = speed
+            });
         }
 
-        using (StreamReader sr = new(_pokemonFilePath))
+        // Add pokemon evolve from
+        foreach (List<string> pokemonData in pokemonSpeciesData)
         {
-            string line;
-            sr.ReadLine(); // skip header
-            while ((line = sr.ReadLine()) != null)
+            string evolveFromIdString = pokemonData[evolveFromIdIndex];
+
+            if (evolveFromIdString.Length == 0)
+                continue;
+
+            int id = Convert.ToInt16(pokemonData[idIndex]);
+            int evolveFromId = Convert.ToInt16(evolveFromIdString);
+
+            PokemonSpecies pokemonSpecies = _context.PokemonSpecies.Find(id);
+            PokemonSpecies evolveFrom = _context.PokemonSpecies.Find(evolveFromId);
+
+            pokemonSpecies.EvolvedFrom = evolveFrom;
+        }
+
+        // Add pokemon growth rates
+        foreach (List<string> pokemonData in pokemonSpeciesData)
+        {
+            int growthRateId = Convert.ToInt16(pokemonData[growthRateIdIndex]);
+            int pokemonSpeciesId = Convert.ToInt16(pokemonData[idIndex]);
+
+            GrowthRate growthRate = _context.GrowthRates.Find(growthRateId);
+            PokemonSpecies pokemonSpecies = _context.PokemonSpecies.Find(pokemonSpeciesId);
+
+            pokemonSpecies.GrowthRate = growthRate;
+        }
+
+        // Add pokemon their types
+        int typeIdIndex = 1;
+        int slotIndex = 2;
+
+        List<List<string>> pokemonTypeData;
+        using (StreamReader sr = new StreamReader(_pokemonTypeFilePath))
+        {
+            CsvReader cr = new CsvReader(sr, 3, true);
+            pokemonTypeData = cr.Read();
+        }
+
+        foreach (List<string> pokemonData in pokemonTypeData)
+        {
+            int id = Convert.ToInt16(pokemonData[idIndex]);
+            int typeId = Convert.ToInt16(pokemonData[typeIdIndex]);
+            int slot = Convert.ToInt16(pokemonData[slotIndex]);
+
+            PokemonSpecies pokemonSpecies = _context.PokemonSpecies.Find(id);
+            PokemonType pokemonType = _context.PokemonTypes.Find(typeId);
+
+            if (slot == 1)
             {
-                string[] lineData = line.Split(',');
-
-                string evolveFromIdString = lineData[evolveFromIdIndex];
-
-                if (evolveFromIdString.Length == 0)
-                    continue;
-
-                int id = Convert.ToInt16(lineData[idIndex]);
-                int evolveFromId = Convert.ToInt16(evolveFromIdString);
-
-                PokemonSpecies? descendantSpecies = _context.PokemonSpecies.Find(id);
-                PokemonSpecies? baseSpecies = _context.PokemonSpecies.Find(evolveFromId);
-
-                if (descendantSpecies == null)
-                    throw new NullReferenceException();
-
-                if (baseSpecies != null)
-                    descendantSpecies.EvolvedFrom = baseSpecies;
+                pokemonSpecies.Type1 = pokemonType;
+            }
+            else if (slot == 2)
+            {
+                pokemonSpecies.Type2 = pokemonType;
             }
         }
 
@@ -191,193 +184,137 @@ public class PokemonDataImporter
 
     private void ImportGrowthRate()
     {
-        // TODO: Refactor and reduce code dependencies
-        // import growth rates
-        using (StreamReader sr = new(_growthRateFilePath))
+        List<List<string>> growthRateDataList;
+        using (StreamReader sr = new StreamReader(_growthRateFilePath))
         {
-            sr.ReadLine(); // Skip header
+            CsvReader reader = new CsvReader(sr, 3, true);
+            growthRateDataList = reader.Read();
+        }
 
-            List<string> result = new();
+        List<List<string>> levelExperienceDataList;
+        using (StreamReader sr = new StreamReader(_growthRateLevelExperienceFilePath))
+        {
+            CsvReader reader = new CsvReader(sr, 3, true);
+            levelExperienceDataList = reader.Read();
+        }
 
-            int cInt;
-            string buffer = "";
+        int idIndex = 0;
+        int nameIndex = 1;
+        int formulaIndex = 2;
+        foreach (List<string> growthRateData in growthRateDataList)
+        {
+            int id = Convert.ToInt16(growthRateData[idIndex]);
+            string name = growthRateData[nameIndex];
+            string formula = growthRateData[formulaIndex];
 
-            bool inQuote = false;
-            // TODO: Refactor this bitch
-            // Lord baby jesus why did it have to be this long. I bet
-            // there was an existing solution too but my lazy ass 
-            // refused to google that shit tsk. Shooting myself in the 
-            // foot istg. Ain't nothing SOLID about this that's for
-            // sure. Talk about dodgy shady ass code... I wrote it like
-            // 5 minutes ago, AND I already don't remember what 50%
-            // of the shit below does
-            // Signed-off-by: Luth Andyka <luthandyka.business@gmail.com>
-            while ((cInt = sr.Read()) != -1)
+            _context.GrowthRates.Add(new GrowthRate()
             {
-                char c = (char)cInt;
-                if (c == '"')
-                {
-                    if (inQuote)
-                    {
-                        buffer += c;
-                        result.Add(buffer);
-                        buffer = "";
-                        inQuote = false;
-                        sr.Read();
-                    }
-                    else
-                    {
-                        buffer += c;
-                        inQuote = true;
-                    }
-                }
-                else if (c == ',')
-                {
-                    if (inQuote)
-                    {
-                        buffer += c;
-                    }
-                    else
-                    {
-                        result.Add(buffer);
-                        buffer = "";
-                    }
-                }
-                else if (c == '\n')
-                {
-                    if (inQuote)
-                    {
-                        buffer += c;
-                    }
-                    else
-                    {
-                        result.Add(buffer);
-                        buffer = "";
-                        continue;
-                    }
-                }
-                else
-                {
-                    buffer += c;
-                }
-            }
-
-            for (int i = 0; i < result.Count; i += 3)
-            {
-                _context.GrowthRates.Add(new GrowthRate()
-                {
-                    Id = Convert.ToInt32(result[i]),
-                    Name = result[i + 1],
-                    Formula = result[i + 2]
-                });
-            }
+                Id = id,
+                Name = name,
+                Formula = formula
+            });
         }
 
         _context.SaveChanges();
 
-        // import Level Exexperiences
-        using (StreamReader sr = new(_growthRateLevelExperienceFilePath))
+        int levelIndex = 1;
+        int experienceIndex = 2;
+        foreach (List<string> levelExperienceData in levelExperienceDataList)
         {
-            string line;
-            int growthRateIdIndex = 0;
-            int levelIndex = 1;
-            int experienceIndex = 2;
-            sr.ReadLine();
-            while ((line = sr.ReadLine()) != null)
+            int growthId = Convert.ToInt16(levelExperienceData[idIndex]);
+            int level = Convert.ToInt16(levelExperienceData[levelIndex]);
+            int experience = Convert.ToInt32(levelExperienceData[experienceIndex]);
+
+            GrowthRate growthRate = _context.GrowthRates.Find(growthId);
+
+            if (growthRate.LevelExperiences is null)
+                growthRate.LevelExperiences = new List<GrowthRateLevelExperience>();
+
+            growthRate.LevelExperiences.Add(new GrowthRateLevelExperience()
             {
-                string[] lineData = line.Split(',');
-                int growthRateId = Convert.ToInt16(lineData[growthRateIdIndex]);
-                int level = Convert.ToInt16(lineData[levelIndex]);
-                int experience = Convert.ToInt32(lineData[experienceIndex]);
-                var growthRate = _context.GrowthRates.Find(growthRateId);
-
-                if (growthRate.LevelExperiences == null)
-                    growthRate.LevelExperiences = new List<GrowthRateLevelExperience>();
-
-                GrowthRateLevelExperience levelExperience = new()
-                {
-                    Level = level,
-                    Experience = experience
-                };
-
-                _context.GrowthRateLevelExperiences.Add(levelExperience);
-                growthRate.LevelExperiences.Add(levelExperience);
-            }
-
-            _context.SaveChanges();
+                Level = level,
+                Experience = experience
+            });
         }
+
+        _context.SaveChanges();
     }
 
     private void ImportTypes()
     {
-        // import types
-        using (StreamReader sr = new(_typeFilePath))
+        List<List<string>> typeDataList;
+        using (StreamReader sr = new StreamReader(_typeFilePath))
         {
-            string line;
-            int idIndex = 0;
-            int nameIndex = 1;
-            sr.ReadLine(); // Ignore first line
-            while ((line = sr.ReadLine()) != null)
-            {
-                string[] lineData = line.Split(',');
-                int id = Convert.ToInt16(lineData[idIndex]);
-                string name = lineData[nameIndex];
+            CsvReader reader = new CsvReader(sr, 2, true);
+            typeDataList = reader.Read();
+        }
 
-                _context.PokemonTypes.Add(new PokemonType()
-                {
-                    Id = id,
-                    Name = name
-                });
-            }
+
+        List<List<string>> typeEfficacyDataList;
+        using (StreamReader sr = new StreamReader(_typeEfficacyFilePath))
+        {
+            CsvReader reader = new CsvReader(sr, 3, true);
+            typeEfficacyDataList = reader.Read();
+        }
+
+        int idIndex = 0;
+        int nameIndex = 1;
+
+        foreach (List<string> typeData in typeDataList)
+        {
+            int id = Convert.ToInt16(typeData[idIndex]);
+            string name = typeData[nameIndex];
+
+            _context.PokemonTypes.Add(new PokemonType()
+            {
+                Id = id,
+                Name = name
+            });
         }
 
         _context.SaveChanges();
 
-        // import type efficacy
-        using (StreamReader sr = new(_typeEfficacyFilePath))
+        int damageTypeIdIndex = 0;
+        int targetTypeIdIndex = 1;
+        int damageFactorIndex = 2;
+
+        foreach (List<string> typeEfficacyData in typeEfficacyDataList)
         {
-            string line;
-            int damageIndex = 0;
-            int targetIndex = 1;
-            int damageFactorIndex = 2;
-            sr.ReadLine(); // Ignore first line
-            while ((line = sr.ReadLine()) != null)
+            int damageTypeId = Convert.ToInt16(damageTypeIdIndex);
+            int targetTypeId = Convert.ToInt16(targetTypeIdIndex);
+            int damageFactor = Convert.ToInt16(damageFactorIndex);
+
+            PokemonType damageType = _context.PokemonTypes.Find(damageTypeId);
+            PokemonType targetType = _context.PokemonTypes.Find(targetTypeId);
+
+            if (targetType.ImmuneTo == null)
+                targetType.ImmuneTo = new List<PokemonType>();
+
+            if (targetType.ResistantTo == null)
+                targetType.ResistantTo = new List<PokemonType>();
+
+            if (targetType.NormalTo == null)
+                targetType.NormalTo = new List<PokemonType>();
+
+            if (targetType.WeakTo == null)
+                targetType.WeakTo = new List<PokemonType>();
+
+            switch (damageFactor)
             {
-                string[] lineData = line.Split(',');
-
-                int damageTypeId = Convert.ToInt16(lineData[damageIndex]);
-                int targetTypeId = Convert.ToInt16(lineData[targetIndex]);
-                int damageFactor = Convert.ToInt16(lineData[damageFactorIndex]);
-
-                PokemonType targetType = _context.PokemonTypes.Find(targetTypeId);
-                PokemonType damageType = _context.PokemonTypes.Find(damageTypeId);
-
-                switch (damageFactor)
-                {
-                    case 200:
-                        if (targetType.WeakTo == null)
-                            targetType.WeakTo = new List<PokemonType>();
-                        targetType.WeakTo.Add(damageType);
-                        break;
-                    case 100:
-                        if (targetType.NormalTo == null)
-                            targetType.NormalTo = new List<PokemonType>();
-                        targetType.NormalTo.Add(damageType);
-                        break;
-                    case 50:
-                        if (targetType.ResistantTo == null)
-                            targetType.ResistantTo = new List<PokemonType>();
-                        targetType.ResistantTo.Add(damageType);
-                        break;
-                    case 0:
-                        if (targetType.ImmuneTo == null)
-                            targetType.ImmuneTo = new List<PokemonType>();
-                        targetType.ImmuneTo.Add(damageType);
-                        break;
-                }
+                case 0:
+                    targetType.ImmuneTo.Add(damageType);
+                    break;
+                case 50:
+                    targetType.ResistantTo.Add(damageType);
+                    break;
+                case 100:
+                    targetType.NormalTo.Add(damageType);
+                    break;
+                case 200:
+                    targetType.WeakTo.Add(damageType);
+                    break;
             }
-
-            _context.SaveChanges();
         }
+        _context.SaveChanges();
     }
 }
