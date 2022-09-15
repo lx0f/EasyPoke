@@ -74,6 +74,17 @@ public class PokemonDataImporter
 
     private void ImportPokemons()
     {
+        var pokemonSpeciesRepository = new PokemonSpeciesRepository(_context);
+        var growthRateRepository = new GrowthRateRepository(_context);
+
+        // Add pokemons
+        List<List<string>> pokemonSpeciesData;
+        using (StreamReader sr = new StreamReader(_pokemonFilePath))
+        {
+            CsvReader cr = new CsvReader(sr, 10, true);
+            pokemonSpeciesData = cr.Read();
+        }
+
         int idIndex = 0;
         int nameIndex = 1;
         int evolveFromIdIndex = 2;
@@ -85,14 +96,6 @@ public class PokemonDataImporter
         int spDefenseIndex = 8;
         int speedIndex = 9;
 
-        // Add pokemons
-        List<List<string>> pokemonSpeciesData;
-        using (StreamReader sr = new StreamReader(_pokemonFilePath))
-        {
-            CsvReader cr = new CsvReader(sr, 10, true);
-            pokemonSpeciesData = cr.Read();
-        }
-
         foreach (List<string> pokemonData in pokemonSpeciesData)
         {
             int id = Convert.ToInt16(pokemonData[idIndex]);
@@ -103,12 +106,16 @@ public class PokemonDataImporter
             int spAttack = Convert.ToInt16(pokemonData[spAttackIndex]);
             int spDefense = Convert.ToInt16(pokemonData[spDefenseIndex]);
             int speed = Convert.ToInt16(pokemonData[speedIndex]);
+            int growthRateId = Convert.ToInt16(pokemonData[growthRateIdIndex]);
+
+            GrowthRate growthRate = growthRateRepository.GetGrowthRateById(growthRateId);
 
             // TODO: change to pokemonspecies repository
-            _context.PokemonSpecies.Add(new PokemonSpecies()
+            pokemonSpeciesRepository.AddPokemonSpecies(new PokemonSpecies()
             {
                 Id = id,
                 Name = name,
+                GrowthRate = growthRate,
                 HitPoint = hitPoint,
                 Attack = attack,
                 Defense = defense,
@@ -129,22 +136,10 @@ public class PokemonDataImporter
             int id = Convert.ToInt16(pokemonData[idIndex]);
             int evolveFromId = Convert.ToInt16(evolveFromIdString);
 
-            PokemonSpecies pokemonSpecies = _context.PokemonSpecies.Find(id);
-            PokemonSpecies evolveFrom = _context.PokemonSpecies.Find(evolveFromId);
+            PokemonSpecies pokemonSpecies = pokemonSpeciesRepository.GetSpeciesById(id);
+            PokemonSpecies evolveFrom = pokemonSpeciesRepository.GetSpeciesById(evolveFromId);
 
             pokemonSpecies.EvolvedFrom = evolveFrom;
-        }
-
-        // Add pokemon growth rates
-        foreach (List<string> pokemonData in pokemonSpeciesData)
-        {
-            int growthRateId = Convert.ToInt16(pokemonData[growthRateIdIndex]);
-            int pokemonSpeciesId = Convert.ToInt16(pokemonData[idIndex]);
-
-            GrowthRate growthRate = _context.GrowthRates.Find(growthRateId);
-            PokemonSpecies pokemonSpecies = _context.PokemonSpecies.Find(pokemonSpeciesId);
-
-            pokemonSpecies.GrowthRate = growthRate;
         }
 
         // Add pokemon their types
@@ -158,14 +153,16 @@ public class PokemonDataImporter
             pokemonTypeData = cr.Read();
         }
 
+        var pokemonTypeRepository = new PokemonTypeRepository(_context);
+
         foreach (List<string> pokemonData in pokemonTypeData)
         {
             int id = Convert.ToInt16(pokemonData[idIndex]);
             int typeId = Convert.ToInt16(pokemonData[typeIdIndex]);
             int slot = Convert.ToInt16(pokemonData[slotIndex]);
 
-            PokemonSpecies pokemonSpecies = _context.PokemonSpecies.Find(id);
-            PokemonType pokemonType = _context.PokemonTypes.Find(typeId);
+            PokemonSpecies pokemonSpecies = pokemonSpeciesRepository.GetSpeciesById(id);
+            PokemonType pokemonType = pokemonTypeRepository.GetTypeById(typeId);
 
             if (slot == 1)
             {
@@ -182,6 +179,8 @@ public class PokemonDataImporter
 
     private void ImportGrowthRate()
     {
+        var growthRateRepository = new GrowthRateRepository(_context);
+
         List<List<string>> growthRateDataList;
         using (StreamReader sr = new StreamReader(_growthRateFilePath))
         {
@@ -205,15 +204,13 @@ public class PokemonDataImporter
             string name = growthRateData[nameIndex];
             string formula = growthRateData[formulaIndex];
 
-            _context.GrowthRates.Add(new GrowthRate()
+            growthRateRepository.AddGrowthRate(new GrowthRate()
             {
                 Id = id,
                 Name = name,
                 Formula = formula
             });
         }
-
-        _context.SaveChanges();
 
         int levelIndex = 1;
         int experienceIndex = 2;
@@ -223,7 +220,7 @@ public class PokemonDataImporter
             int level = Convert.ToInt16(levelExperienceData[levelIndex]);
             int experience = Convert.ToInt32(levelExperienceData[experienceIndex]);
 
-            GrowthRate growthRate = _context.GrowthRates.Find(growthId);
+            GrowthRate growthRate = growthRateRepository.GetGrowthRateById(growthId);
 
             if (growthRate.LevelExperiences is null)
                 growthRate.LevelExperiences = new List<GrowthRateLevelExperience>();
@@ -234,12 +231,13 @@ public class PokemonDataImporter
                 Experience = experience
             });
         }
-
         _context.SaveChanges();
     }
 
     private void ImportTypes()
     {
+        var pokemonTypeRepository = new PokemonTypeRepository(_context);
+
         List<List<string>> typeDataList;
         using (StreamReader sr = new StreamReader(_typeFilePath))
         {
@@ -263,14 +261,12 @@ public class PokemonDataImporter
             int id = Convert.ToInt16(typeData[idIndex]);
             string name = typeData[nameIndex];
 
-            _context.PokemonTypes.Add(new PokemonType()
+            pokemonTypeRepository.AddType(new PokemonType()
             {
                 Id = id,
                 Name = name
             });
         }
-
-        _context.SaveChanges();
 
         int damageTypeIdIndex = 0;
         int targetTypeIdIndex = 1;
@@ -282,8 +278,8 @@ public class PokemonDataImporter
             int targetTypeId = Convert.ToInt16(targetTypeIdIndex);
             int damageFactor = Convert.ToInt16(damageFactorIndex);
 
-            PokemonType damageType = _context.PokemonTypes.Find(damageTypeId);
-            PokemonType targetType = _context.PokemonTypes.Find(targetTypeId);
+            PokemonType damageType = pokemonTypeRepository.GetTypeById(damageTypeId);
+            PokemonType targetType = pokemonTypeRepository.GetTypeById(targetTypeId);
 
             if (targetType.ImmuneTo == null)
                 targetType.ImmuneTo = new List<PokemonType>();
