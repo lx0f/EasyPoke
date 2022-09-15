@@ -4,6 +4,11 @@ namespace EasyPoke.API.Models;
 
 public class User
 {
+    public User()
+    {
+        Pokemons = new HashSet<Pokemon>();
+    }
+
     [Key]
     public int Id { get; set; }
     public string Username { get; set; }

@@ -281,18 +281,6 @@ public class PokemonDataImporter
             PokemonType damageType = pokemonTypeRepository.GetTypeById(damageTypeId);
             PokemonType targetType = pokemonTypeRepository.GetTypeById(targetTypeId);
 
-            if (targetType.ImmuneTo == null)
-                targetType.ImmuneTo = new List<PokemonType>();
-
-            if (targetType.ResistantTo == null)
-                targetType.ResistantTo = new List<PokemonType>();
-
-            if (targetType.NormalTo == null)
-                targetType.NormalTo = new List<PokemonType>();
-
-            if (targetType.WeakTo == null)
-                targetType.WeakTo = new List<PokemonType>();
-
             switch (damageFactor)
             {
                 case 0:
