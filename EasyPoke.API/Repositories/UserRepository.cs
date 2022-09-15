@@ -21,7 +21,7 @@ public class UserRepository : IUserRepository
     {
         User? user = _context.Users.Find(id);
 
-        if (user == null)
+        if (user is null)
             throw new KeyNotFoundException();
 
         _context.Users.Remove(user);

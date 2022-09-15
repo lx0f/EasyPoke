@@ -21,7 +21,7 @@ public class UserController : ControllerBase
     {
         User? user = _service.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         return Ok(user);
@@ -32,7 +32,7 @@ public class UserController : ControllerBase
     {
         User? user = _service.GetUserByUsername(username);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         return Ok(user);
@@ -43,10 +43,21 @@ public class UserController : ControllerBase
     {
         User? user = _service.GetUserByEmail(email);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         return Ok(user);
+    }
+
+    [HttpGet("{id}/pokemon", Name = "GetUserPokemonsById")]
+    public IActionResult GetUserPokemonsById(int id)
+    {
+        User? user = _service.GetUserById(id);
+
+        if (user is null)
+            return NotFound();
+
+        return Ok(user.Pokemons);
     }
 
     [HttpPost("register", Name = "RegisterUser")]
@@ -54,7 +65,7 @@ public class UserController : ControllerBase
     {
         User? user = _service.RegisterUser(info);
 
-        if (user == null)
+        if (user is null)
             return BadRequest();
 
         return CreatedAtAction(nameof(RegisterUser), user);
@@ -65,7 +76,7 @@ public class UserController : ControllerBase
     {
         User? user = _service.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         bool result = _service.UpdateUserUsername(id, username);
@@ -81,7 +92,7 @@ public class UserController : ControllerBase
     {
         User? user = _service.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         bool result = _service.UpdateUserEmail(id, email);
@@ -97,7 +108,7 @@ public class UserController : ControllerBase
     {
         User? user = _service.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return NotFound();
 
         bool result = _service.UpdateUserPassword(id, password);

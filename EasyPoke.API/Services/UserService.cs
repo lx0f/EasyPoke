@@ -17,7 +17,7 @@ public class UserService : IUserService
     {
         User? user = _repository.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return false;
 
         _repository.DeleteUser(id);
@@ -75,7 +75,7 @@ public class UserService : IUserService
     {
         User? user = _repository.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return false;
 
         User? potentialUser = _repository.GetUserByEmail(email);
@@ -93,7 +93,7 @@ public class UserService : IUserService
     {
         User? user = _repository.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return false;
 
         bool isValid = ValidatePassword(password);
@@ -111,7 +111,7 @@ public class UserService : IUserService
     {
         User? user = _repository.GetUserById(id);
 
-        if (user == null)
+        if (user is null)
             return false;
 
         User? potentialUser = _repository.GetUserByUsername(username);
