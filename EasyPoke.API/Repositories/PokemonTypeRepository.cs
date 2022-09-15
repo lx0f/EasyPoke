@@ -2,7 +2,7 @@ using EasyPoke.API.Models;
 
 namespace EasyPoke.API.Repositories;
 
-public class PokemonTypeRepository
+public class PokemonTypeRepository : IPokemonTypeRepository
 {
     private readonly DataContext _context;
 
@@ -11,14 +11,28 @@ public class PokemonTypeRepository
         _context = context;
     }
 
-    public void AddType(PokemonType pokemonType)
+    public void Add(PokemonType pokemonType)
     {
         _context.PokemonTypes.Add(pokemonType);
-        _context.SaveChanges();
     }
 
-    public PokemonType? GetTypeById(int typeId)
+    public PokemonType? Get(int id)
     {
-        return _context.PokemonTypes.Find(typeId);
+        return _context.PokemonTypes.Find(id);
+    }
+
+    public int Save()
+    {
+        return _context.SaveChanges();
+    }
+
+    public IEnumerable<PokemonType> GetAll()
+    {
+        return _context.PokemonTypes.ToList();
+    }
+
+    public void RemoveRange(IEnumerable<PokemonType> types)
+    {
+        _context.PokemonTypes.RemoveRange(types);
     }
 }

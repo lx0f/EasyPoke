@@ -11,13 +11,13 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public void AddUser(User user)
+    public void Add(User user)
     {
         _context.Users.Add(user);
         _context.SaveChanges();
     }
 
-    public void DeleteUser(int id)
+    public void Delete(int id)
     {
         User? user = _context.Users.Find(id);
 
@@ -28,25 +28,25 @@ public class UserRepository : IUserRepository
         _context.SaveChanges();
     }
 
-    public User? GetUserByEmail(string email)
+    public User? GetByEmail(string email)
     {
         User? user = _context.Users.FirstOrDefault(u => u.Email == email);
         return user;
     }
 
-    public User? GetUserById(int id)
+    public User? Get(int id)
     {
         User? user = _context.Users.Find(id);
         return user;
     }
 
-    public User? GetUserByUsername(string username)
+    public User? GetByUsername(string username)
     {
         User? user = _context.Users.FirstOrDefault(u => u.Username == username);
         return user;
     }
 
-    public void UpdateUser(User user)
+    public void Update(User user)
     {
         _context.Users.Update(user);
         _context.SaveChanges();

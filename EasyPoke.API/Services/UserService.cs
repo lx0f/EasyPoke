@@ -15,41 +15,41 @@ public class UserService : IUserService
 
     public bool DeleteUser(int id)
     {
-        User? user = _repository.GetUserById(id);
+        User? user = _repository.Get(id);
 
         if (user is null)
             return false;
 
-        _repository.DeleteUser(id);
+        _repository.Delete(id);
         return true;
     }
 
     public User? GetUserByEmail(string email)
     {
-        User? user = _repository.GetUserByEmail(email);
+        User? user = _repository.GetByEmail(email);
         return user;
     }
 
     public User? GetUserById(int id)
     {
-        User? user = _repository.GetUserById(id);
+        User? user = _repository.Get(id);
         return user;
     }
 
     public User? GetUserByUsername(string username)
     {
-        User? user = _repository.GetUserByUsername(username);
+        User? user = _repository.GetByUsername(username);
         return user;
     }
 
     public User? RegisterUser(UserRegisterInfo info)
     {
-        User? userUsername = _repository.GetUserByUsername(info.Username);
+        User? userUsername = _repository.GetByUsername(info.Username);
 
         if (userUsername != null)
             return null;
 
-        User? userEmail = _repository.GetUserByEmail(info.Email);
+        User? userEmail = _repository.GetByEmail(info.Email);
 
         if (userEmail != null)
             return null;
@@ -66,32 +66,32 @@ public class UserService : IUserService
             Password = info.Password
         };
 
-        _repository.AddUser(user);
+        _repository.Add(user);
 
         return user;
     }
 
     public bool UpdateUserEmail(int id, string email)
     {
-        User? user = _repository.GetUserById(id);
+        User? user = _repository.Get(id);
 
         if (user is null)
             return false;
 
-        User? potentialUser = _repository.GetUserByEmail(email);
+        User? potentialUser = _repository.GetByEmail(email);
 
         if (potentialUser != null)
             return false;
 
         user.Email = email;
-        _repository.UpdateUser(user);
+        _repository.Update(user);
 
         return true;
     }
 
     public bool UpdateUserPassword(int id, string password)
     {
-        User? user = _repository.GetUserById(id);
+        User? user = _repository.Get(id);
 
         if (user is null)
             return false;
@@ -102,25 +102,25 @@ public class UserService : IUserService
             return false;
 
         user.Password = password;
-        _repository.UpdateUser(user);
+        _repository.Update(user);
 
         return true;
     }
 
     public bool UpdateUserUsername(int id, string username)
     {
-        User? user = _repository.GetUserById(id);
+        User? user = _repository.Get(id);
 
         if (user is null)
             return false;
 
-        User? potentialUser = _repository.GetUserByUsername(username);
+        User? potentialUser = _repository.GetByUsername(username);
 
         if (potentialUser != null)
             return false;
 
         user.Username = username;
-        _repository.UpdateUser(user);
+        _repository.Update(user);
 
         return true;
     }
