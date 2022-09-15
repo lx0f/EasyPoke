@@ -1,5 +1,3 @@
-// TODO: Refactor this damn importing function - ITS TOO LONG
-
 using EasyPoke.API.Models;
 using EasyPoke.API.Repositories;
 
