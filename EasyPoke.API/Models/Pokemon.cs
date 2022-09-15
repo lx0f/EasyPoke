@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EasyPoke.API.Models;
 
@@ -9,6 +10,7 @@ public class Pokemon
     public int Level { get; set; }
     public int Experience { get; set; }
 
-    public PokemonSpecies PokemonSpecies { get; set; }
+    [JsonIgnore]
     public User User { get; set; }
+    public PokemonSpecies PokemonSpecies { get; set; }
 }

@@ -1,4 +1,5 @@
 using EasyPoke.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyPoke.API.Repositories;
 
@@ -50,5 +51,12 @@ public class UserRepository : IUserRepository
     {
         _context.Users.Update(user);
         _context.SaveChanges();
+    }
+
+    public User? GetIncludePokemons(int id)
+    {
+        return _context.Users
+            .Include(u => u.Pokemons)
+            .FirstOrDefault(u => u.Id == id);
     }
 }

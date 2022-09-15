@@ -10,22 +10,25 @@ public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        // NOTE: Its commented out to use swagger for testing. Uncomment
+        // everything when deployed
+        //
         // check if request header contain api key
-        if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var potentialApiKey))
-        {
-            context.Result = new UnauthorizedResult();
-            return;
-        }
+        // if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var potentialApiKey))
+        // {
+        //     context.Result = new UnauthorizedResult();
+        //     return;
+        // }
 
-        var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-        var apiKey = configuration.GetValue<string>("ApiKey");
+        // var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+        // var apiKey = configuration.GetValue<string>("ApiKey");
 
         // check if api key is valid
-        if (!apiKey.Equals(potentialApiKey))
-        {
-            context.Result = new UnauthorizedResult();
-            return;
-        }
+        // if (!apiKey.Equals(potentialApiKey))
+        // {
+        //     context.Result = new UnauthorizedResult();
+        //     return;
+        // }
 
         await next();
     }

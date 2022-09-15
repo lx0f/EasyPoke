@@ -29,8 +29,17 @@ public static class Configure
                 ServerVersion.AutoDetect(connectionString));
         });
 
+        // Add repositories
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IPokemonTypeRepository, PokemonTypeRepository>();
+        services.AddTransient<IPokemonSpeciesRepository, PokemonSpeciesRepository>();
+        services.AddTransient<IPokemonRepository, PokemonRepository>();
+        services.AddTransient<IGrowthRateRepository, GrowthRateRepository>();
+
+        // Add services
         services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IPokemonSpeciesService, PokemonSpeciesService>();
+        services.AddTransient<IPokemonService, PokemonService>();
 
         // Add controllers
         services.AddControllers();

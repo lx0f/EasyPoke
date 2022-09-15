@@ -10,5 +10,6 @@ public interface IUserRepository
     User? Get(int id);
     User? GetByUsername(string username);
     void Update(User user);
+    User? GetIncludePokemons(int id);
 }
 

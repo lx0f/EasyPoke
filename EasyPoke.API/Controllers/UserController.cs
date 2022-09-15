@@ -49,17 +49,6 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
-    [HttpGet("{id}/pokemon", Name = "GetUserPokemonsById")]
-    public IActionResult GetUserPokemonsById(int id)
-    {
-        User? user = _service.GetUserById(id);
-
-        if (user is null)
-            return NotFound();
-
-        return Ok(user.Pokemons);
-    }
-
     [HttpPost("register", Name = "RegisterUser")]
     public IActionResult RegisterUser(UserRegisterInfo info)
     {

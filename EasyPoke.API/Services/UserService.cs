@@ -36,6 +36,12 @@ public class UserService : IUserService
         return user;
     }
 
+    public User? GetUserByIdIncludePokemons(int id)
+    {
+        User? user = _repository.GetIncludePokemons(id);
+        return user;
+    }
+
     public User? GetUserByUsername(string username)
     {
         User? user = _repository.GetByUsername(username);
